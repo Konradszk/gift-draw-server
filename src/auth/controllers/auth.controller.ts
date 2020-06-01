@@ -1,22 +1,25 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
-import { LocalAuthGuard } from '../guards/local.guard';
+import { Body, Controller, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import { NoGuard } from '../guards/no.guard';
 import { AuthFacade } from '../facades/auth.facade';
 import { LoginDTO } from '../dto/LoginDTO';
+import { Response } from 'express';
+
 
 @Controller('auth')
 export class AuthController {
 
   constructor(
-    private readonly authFacade: AuthFacade
+    private readonly authFacade: AuthFacade,
   ) {
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(NoGuard)
   @Post('login')
-  async login(@Request() req:LoginDTO) {
-    console.log('test');
-    console.log(req);
-    return this.authFacade.login(req);
+  async login(@Body() req: LoginDTO,
+              @Res() res: Response) {
+    const accessToken: string = await this.authFacade.login(req);
+    res.header("Authorization", accessToken)
+    res.status(HttpStatus.OK).send();
   }
 
 }

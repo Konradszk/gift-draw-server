@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { LoginDTO } from '../dto/LoginDTO';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class AuthFacade {
@@ -10,7 +11,9 @@ export class AuthFacade {
   ) {
   }
 
-  login(data: LoginDTO) {
-    return this.authService.login({ userId: 1, username: data.login });
+   async login(data: LoginDTO): Promise<string> {
+    const hashedPassWord: string = await hash(data.password, 10);
+    const token = await this.authService.login({ login: data.login, passwordHash: hashedPassWord });
+    return token.accessToken;
   }
 }
