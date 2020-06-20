@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/services/user.service';
-import { hash } from 'bcrypt';
-import { of } from 'rxjs';
-import { LoginData } from '../domain/login-data.interface';
 import { LoggedData } from '../domain/logged-data.interface';
+import { map, tap } from 'rxjs/operators';
+import { User } from '../../user/domain/user';
+import { TokenData } from '../domain/token-data.interface';
 
 @Injectable()
 export class AuthService {
@@ -15,20 +15,21 @@ export class AuthService {
   ) {
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = this.userService.findOne(username);
-    const hashedPass = await hash(password, 10);
-    if (user.password === hashedPass) {
-      const { password, ...result } = user;
-      return of(result).toPromise();
-    }
-
-    throw new UnauthorizedException();
+  async validateUser(username: string, password: string): Promise<TokenData> {
+    const user = this.userService.findOne({ login: username });
+    return user.pipe(
+      tap(user => {
+        if (user.passwordHash !== User.generateHash(password)) {
+          throw new UnauthorizedException();
+        }
+      }),
+      map(user => ({ username: user.login, sub: user.id })),
+    ).toPromise();
   }
 
-  async login(user: LoginData): Promise<LoggedData> {
-    const payload = { username: user.login, sub: 4 };
-    const token: string = await this.jwtService.signAsync(payload);
+  async login(data: TokenData): Promise<LoggedData> {
+
+    const token: string = await this.jwtService.signAsync(data);
     return {
       accessToken: token,
     };

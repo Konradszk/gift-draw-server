@@ -1,15 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../domain/user.interface';
-import { hashSync } from 'bcrypt';
+import { InjectRepository, Repository } from '@nestjs/azure-database/dist';
+import { User, USER_ROW_KEY } from '../domain/user';
+import { from, Observable } from 'rxjs';
+import { NewUser } from '../domain/new-user';
 
 @Injectable()
 export class UserService {
 
-  testUsers: User[] = [
-    { name: 'testName', login: 'test', password: hashSync('pass', 10) },
-  ];
+  constructor(@InjectRepository(User)
+              private readonly userRepository: Repository<User>) {
+  }
 
-  public findOne(username: string): User {
-    return this.testUsers.find(user => user.login === username);
+
+
+  public findOne(data: { login: string }): Observable<User> {
+    return from(this.userRepository.find(USER_ROW_KEY, {login: data.login}));
+  }
+
+  public register(userData: NewUser): Observable<User> {
+    const user = new User(userData);
+    user.generateID();
+    return from(this.userRepository.create(user));
   }
 }
