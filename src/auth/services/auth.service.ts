@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/services/user.service';
 import { LoggedData } from '../domain/logged-data.interface';
 import { map, tap } from 'rxjs/operators';
-import { User } from '../../user/domain/user';
+import { User } from '../../user/domain/user.entity';
 import { TokenData } from '../domain/token-data.interface';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class AuthService {
           throw new UnauthorizedException();
         }
       }),
-      map(user => ({ username: user.login, sub: user.id })),
+      map(user => ({ username: user.login, sub: user.id.toString() })),
     ).toPromise();
   }
 

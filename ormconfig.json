@@ -1,0 +1,10 @@
+{
+  "type": "mssql",
+  "host": "localhost",
+  "port": 1433,
+  "username": "---------",
+  "password": "------------",
+  "database": "---------",
+  "entities": ["dist/**/*.entity{.ts,.js}"],
+  "synchronize": false
+}

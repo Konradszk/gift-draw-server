@@ -1,39 +1,36 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { EntityPartitionKey, EntityRowKey, EntityString } from '@nestjs/azure-database/dist';
 import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
 import { hashSync } from 'bcrypt';
 import { NewUser } from './new-user';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export const PARTITION_KEY = 'UserID';
-export const USER_ROW_KEY = 'UserKey';
-
-@EntityPartitionKey(PARTITION_KEY)
-@EntityRowKey(USER_ROW_KEY)
+@Entity({ schema: 'dbo'})
 export class User {
 
   constructor(newUser: NewUser) {
-    this.login = newUser.login;
-    this.name = newUser.name
-    this.passwordHash = newUser.passwordHash;
+    this.login = newUser?.login;
+    this.name = newUser?.name;
+    this.passwordHash = newUser?.passwordHash;
   }
-  @EntityString()
-  id: string;
+
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @IsNotEmpty()
   @IsString()
   @MinLength(4)
-  @EntityString()
+  @Column('varchar',{ unique: true, length: 50 })
   login: string;
 
   @IsNotEmpty()
   @IsString()
-  @EntityString()
+  @Column('varchar',{ unique: true, length: 'MAX' })
   passwordHash: string;
 
   @IsNotEmpty()
   @IsString()
   @MinLength(4)
-  @EntityString()
+  @Column('varchar',{ unique: true, length: 50 })
   name: string;
 
   public generateID(): void {

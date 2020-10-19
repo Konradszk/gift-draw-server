@@ -23,6 +23,7 @@ export class AuthController {
     res.status(HttpStatus.OK).send();
   }
 
+  @UseGuards(NoGuard)
   @Post('register')
   async register(@Body() dto: SignUpDTO,
            @Res() res: Response) {

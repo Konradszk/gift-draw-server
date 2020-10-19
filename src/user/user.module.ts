@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './services/user.service';
 import { UserController } from './controller/user.controller';
-import { AzureTableStorageModule } from '@nestjs/azure-database/dist';
-import { User } from './domain/user';
+import { User } from './domain/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   controllers: [UserController],
-  imports: [AzureTableStorageModule.forFeature(User, { createTableIfNotExists: true })],
+  imports: [TypeOrmModule.forFeature([User])],
   providers: [UserService],
-  exports: [UserService],
+  exports: [UserService, TypeOrmModule],
 })
 export class UserModule {
 }

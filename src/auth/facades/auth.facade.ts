@@ -4,7 +4,7 @@ import { LoginDTO } from '../dto/LoginDTO';
 import { SignUpDTO } from '../dto/SignUpDTO';
 import { UserService } from '../../user/services/user.service';
 import { TokenData } from '../domain/token-data.interface';
-import { User } from '../../user/domain/user';
+import { User } from '../../user/domain/user.entity';
 
 @Injectable()
 export class AuthFacade {
@@ -24,7 +24,7 @@ export class AuthFacade {
   async signUpUser(dto: SignUpDTO): Promise<any> {
     const passwordHash: string = User.generateHash(dto.password);
     const user = await this.userService.register({ ...dto, passwordHash }).toPromise();
-    const token = await this.authService.login({ username: user.name, sub: user.id });
+    const token = await this.authService.login({ username: user.name, sub: user.id.toString() });
     return {
       ...user,
       accessToken :token.accessToken,
