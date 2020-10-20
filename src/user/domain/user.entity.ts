@@ -33,10 +33,6 @@ export class User {
   @Column('varchar',{ unique: true, length: 50 })
   name: string;
 
-  public generateID(): void {
-    this.id = randomStringGenerator();
-  }
-
   public static generateHash(rawPassword: string) {
     return hashSync(rawPassword, 10);
   }

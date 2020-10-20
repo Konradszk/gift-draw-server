@@ -27,7 +27,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() dto: SignUpDTO,
            @Res() res: Response) {
-    const newUserData = await this.authFacade.signUpUser(dto);
+    const newUserData = await this.authFacade.signUpUser(dto).toPromise();
     res.header('Authorization', newUserData.accessToken);
     res.status(HttpStatus.OK)
     res.json({...newUserData})

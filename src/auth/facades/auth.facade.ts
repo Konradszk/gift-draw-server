@@ -5,6 +5,8 @@ import { SignUpDTO } from '../dto/SignUpDTO';
 import { UserService } from '../../user/services/user.service';
 import { TokenData } from '../domain/token-data.interface';
 import { User } from '../../user/domain/user.entity';
+import { first, map, mergeMap, tap } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
 
 @Injectable()
 export class AuthFacade {
@@ -15,19 +17,24 @@ export class AuthFacade {
   ) {
   }
 
-  async login(data: LoginDTO): Promise<string> {
+  public async login(data: LoginDTO): Promise<string> {
     const payload: TokenData = await this.authService.validateUser(data.login, data.password);
     const token = await this.authService.login(payload);
     return token.accessToken;
   }
 
-  async signUpUser(dto: SignUpDTO): Promise<any> {
+  public signUpUser(dto: SignUpDTO): Observable<any> {
     const passwordHash: string = User.generateHash(dto.password);
-    const user = await this.userService.register({ ...dto, passwordHash }).toPromise();
-    const token = await this.authService.login({ username: user.name, sub: user.id.toString() });
-    return {
-      ...user,
-      accessToken :token.accessToken,
-    };
+    return from(this.userService.register({ ...dto, passwordHash })).pipe(
+      first(),
+      mergeMap(async user => ({
+        token: await this.authService.login({ username: user.name, sub: user.id.toString() }),
+        user,
+      })),
+      map(({ token, user }) => ({
+        ...user,
+        accessToken: token.accessToken,
+      })),
+    );
   }
 }
