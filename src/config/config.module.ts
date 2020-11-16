@@ -11,7 +11,7 @@ import { configProd } from './prod-db.config';
       isGlobal: true,
       load: [configuration]
     }),
-    TypeOrmModule.forRoot(process.env.NODE_ENV === 'production' ? configDev : configProd )
+    TypeOrmModule.forRoot(process.env.NODE_ENV === 'production' ? {...configProd} : {...configDev} )
   ],
 })
 export class ConfigModule {
