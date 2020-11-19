@@ -3,6 +3,8 @@ import { User } from '../domain/user.entity';
 import { NewUser } from '../domain/new-user';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { from, Observable, of } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 
 @Injectable()
 export class UserService {
@@ -11,22 +13,25 @@ export class UserService {
               private readonly userRepository: Repository<User>) {
   }
 
-  public async register(userData: NewUser): Promise<User> {
-    await this.validateNewUser(userData.login);
-    const user = new User(userData);
-    return this.userRepository.save(user);
+  public register(userData: NewUser): Observable<User> {
+    return this.validateNewUser(userData.login).pipe(
+      switchMap(() => of(new User(userData))),
+      switchMap(async (user: User) => await this.userRepository.save(user)),
+    );
   }
 
-  public async findOne(data: { login: string }): Promise<User> {
-    return this.userRepository.findOne({ where: { login: data.login } });
+  public findOne(data: { login: string }): Observable<User> {
+    return from(this.userRepository.findOne({ where: { login: data.login } }));
   }
 
 
-  private async validateNewUser(login: string) {
-    const user: User = await this.findOne({ login });
-    if (user) {
-      throw new BadRequestException('Login taken');
-    }
-    return user;
+
+  private validateNewUser(login: string): Observable<User> {
+    return this.findOne({ login }).pipe(tap(user => {
+      if (user) {
+        throw new BadRequestException('Login taken');
+      }
+    }));
+
   }
 }

@@ -4,9 +4,9 @@ import { LoginDTO } from '../dto/LoginDTO';
 import { SignUpDTO } from '../dto/SignUpDTO';
 import { UserService } from '../../user/services/user.service';
 import { TokenData } from '../domain/token-data.interface';
-import { User } from '../../user/domain/user.entity';
-import { first, map, mergeMap, tap } from 'rxjs/operators';
-import { from, Observable } from 'rxjs';
+import { generateHash } from '../../user/domain/user.entity';
+import { first, map, mergeMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthFacade {
@@ -24,8 +24,8 @@ export class AuthFacade {
   }
 
   public signUpUser(dto: SignUpDTO): Observable<any> {
-    const passwordHash: string = User.generateHash(dto.password);
-    return from(this.userService.register({ ...dto, passwordHash })).pipe(
+    const passwordHash: string = generateHash(dto.password);
+    return this.userService.register({ ...dto, passwordHash }).pipe(
       first(),
       mergeMap(async user => ({
         token: await this.authService.login({ username: user.name, sub: user.id.toString() }),
