@@ -1,0 +1,10 @@
+{
+  "type": "mssql",
+  "host": "localhost",
+  "port": 1433,
+  "username": "gift_draw_db",
+  "password": "testdb",
+  "database": "gift_draw_local",
+  "entities": ["./src/**/*.entity{.ts,.js}", "./dist/**/*.entity.js"],
+  "synchronize": false
+}
