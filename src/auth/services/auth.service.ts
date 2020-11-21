@@ -1,11 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../user/services/user.service';
 import { LoggedData } from '../domain/logged-data.interface';
 import { map, tap } from 'rxjs/operators';
-import { User } from '../../user/domain/user.entity';
 import { TokenData } from '../domain/token-data.interface';
-import { from } from 'rxjs';
+import { compareSync } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -17,11 +16,11 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string): Promise<TokenData> {
-    const user = from(this.userService.findOne({ login: username }));
+    const user = this.userService.findOne({ login: username });
     return user.pipe(
       tap(user => {
-        if (user.passwordHash !== User.generateHash(password)) {
-          throw new UnauthorizedException();
+        if (!user || !user.passwordHash || !compareSync(password, user.passwordHash)) {
+          throw new BadRequestException();
         }
       }),
       map(user => ({ username: user.login, sub: user.id.toString() })),
