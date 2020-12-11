@@ -14,7 +14,7 @@ export class UserService {
   }
 
   public register(userData: NewUser): Observable<User> {
-    return this.validateNewUser(userData.login).pipe(
+    return this.validateNewUser(userData).pipe(
       switchMap(() => of(new User(userData))),
       switchMap(async (user: User) => await this.userRepository.save(user)),
     );
@@ -25,13 +25,19 @@ export class UserService {
   }
 
 
-
-  private validateNewUser(login: string): Observable<User> {
-    return this.findOne({ login }).pipe(tap(user => {
-      if (user) {
-        throw new BadRequestException('Login taken');
-      }
-    }));
+  private validateNewUser(userData: NewUser): Observable<User> {
+    return this.findOne({ login: userData.login }).pipe(
+      tap(user => {
+        if (user) {
+          throw new BadRequestException('Login taken');
+        }
+      }),
+      tap(() => {
+        if (userData?.registerSecret !== process.env.REGISTER_SECRET) {
+          throw new BadRequestException('Wrong register secret');
+        }
+      })
+    );
 
   }
 }
