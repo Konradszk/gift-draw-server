@@ -15,4 +15,9 @@ export class SignUpDTO {
   @IsString()
   @MinLength(4)
   public password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(4)
+  public registerSecret: string;
 }
