@@ -1,20 +1,21 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { DrawFacade } from '../facades/draw.facade';
 import { Observable } from 'rxjs';
 import { DrawDTO } from '../dto/DrawDTO';
+import { CreateDrawDTO } from '../dto/CreateDrawDTO';
 
 @Controller('draw')
 export class DrawController {
   constructor(private readonly drawFacade: DrawFacade) {
   }
 
-  @Get('test')
-  getHello(): string {
-    return 'hello';
+  @Get(':id')
+  public getDrawByID(@Param('id') id: number): Observable<DrawDTO> {
+    return this.drawFacade.getDrawByID(id);
   }
 
-  @Get(':id')
-  public  getDrawByID(@Param('id') id: string): Observable<DrawDTO>{
-    return this.drawFacade.getDrawByID(id);
+  @Post()
+  public createDraw(@Body() dto: CreateDrawDTO): Observable<DrawDTO> {
+    return this.drawFacade.createDraw(dto);
   }
 }
