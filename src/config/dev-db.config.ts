@@ -4,9 +4,9 @@ export const configDev: ConnectionOptions =  {
   type: "mssql",
   host: "localhost",
   port: 1433,
-  username: "------b",
-  password: "---",
-  database: "-------",
+  username: "gift_draw_db",
+  password: "testdb",
+  database: "gift_draw_local",
   entities: ["dist/**/*.entity{.ts,.js}"],
   synchronize: false
 };

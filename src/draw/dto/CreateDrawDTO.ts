@@ -1,4 +1,5 @@
 import { IsArray, IsDate, IsNotEmpty, IsString, MinDate, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateDrawDTO {
 
@@ -11,9 +12,10 @@ export class CreateDrawDTO {
   @IsString()
   secret: string;
 
-  // @IsDate()
-  // @MinDate(CreateDrawDTO.getMinimalFinishDate())
-  // finishDate: Date;
+  @IsDate()
+  @Type(() => Date)
+  @MinDate(CreateDrawDTO.getMinimalFinishDate())
+  finishDate: Date;
 
   @IsArray()
   participants: string[];

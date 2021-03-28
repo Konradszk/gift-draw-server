@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { Draw } from './draw.entity';
+import { Match } from './match.entity';
 
 @Entity({ schema: 'dbo' })
 export class Participant {
@@ -22,10 +22,14 @@ export class Participant {
   @Column('int')
   userId: number;
 
-  @ManyToMany(()=> Draw, d => d.participants)
-  draws:Draw[];
+  @OneToMany(() => Match, m => m.participant)
+  matches: Array<Match>;
 
-  static fromDto(name: string){
+  static fromDto(name: string) {
     return new Participant(undefined, name);
+  }
+
+  static fromList(names: string[]): Participant[] {
+    return names.map(name => this.fromDto(name));
   }
 }

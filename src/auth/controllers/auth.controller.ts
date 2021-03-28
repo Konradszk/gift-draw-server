@@ -1,9 +1,9 @@
-import { Body, Controller, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
-import { NoGuard } from '../guards/no.guard';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthFacade } from '../facades/auth.facade';
 import { LoginDTO } from '../dto/LoginDTO';
 import { Response } from 'express';
 import { SignUpDTO } from '../dto/SignUpDTO';
+import { Public } from '../guards/public.addnotation';
 
 
 @Controller('auth')
@@ -14,7 +14,7 @@ export class AuthController {
   ) {
   }
 
-  @UseGuards(NoGuard)
+  @Public()
   @Post('login')
   async login(@Body() req: LoginDTO,
               @Res() res: Response) {
@@ -23,7 +23,7 @@ export class AuthController {
     res.status(HttpStatus.OK).send();
   }
 
-  @UseGuards(NoGuard)
+  @Public()
   @Post('register')
   async register(@Body() dto: SignUpDTO,
            @Res() res: Response) {

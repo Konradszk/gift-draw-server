@@ -1,12 +1,13 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { genSaltSync, hashSync } from 'bcrypt';
 import { NewUser } from './new-user';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Draw } from '../../draw/domain/draw.entity';
 
 @Entity({ schema: 'dbo' })
 export class User {
 
-  constructor(newUser: NewUser) {
+  constructor(newUser?: NewUser) {
     this.login = newUser?.login;
     this.name = newUser?.name;
     this.passwordHash = newUser?.passwordHash;
@@ -33,6 +34,15 @@ export class User {
   name: string;
 
 
+  @OneToMany(()=> Draw, d => d.owner)
+  public drawList: Array<Draw>;
+
+  static fromTokenData(id: string, username: string): User {
+    const user = new User();
+    user.id = +id;
+    user.login = username;
+    return user;
+  }
 }
 
 export function generateHash(rawPassword: string) {

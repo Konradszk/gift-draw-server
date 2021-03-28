@@ -7,11 +7,12 @@ import { Draw } from './domain/draw.entity';
 import { Participant } from './domain/participant.entity';
 import { ParticipantService } from './services/participant/participant.service';
 import { Match } from './domain/match.entity';
+import { MatchService } from './services/match/match.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Match, Participant, Draw])],
   controllers: [DrawController],
-  providers: [DrawService, DrawFacade, ParticipantService],
+  providers: [DrawService, DrawFacade, ParticipantService, MatchService],
   exports: [TypeOrmModule]
 })
 export class DrawModule {}

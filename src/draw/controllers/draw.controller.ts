@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request } from '@nestjs/common';
 import { DrawFacade } from '../facades/draw.facade';
 import { Observable } from 'rxjs';
 import { DrawDTO } from '../dto/DrawDTO';
@@ -15,7 +15,8 @@ export class DrawController {
   }
 
   @Post()
-  public createDraw(@Body() dto: CreateDrawDTO): Observable<DrawDTO> {
-    return this.drawFacade.createDraw(dto);
+  public createDraw(@Body() dto: CreateDrawDTO, @Request() req): Observable<DrawDTO> {
+    const userData = req.user;
+    return this.drawFacade.createDraw(dto, userData);
   }
 }
