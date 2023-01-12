@@ -32,7 +32,7 @@
     "@nestjs/typeorm": "^7.1.4",
     "bcrypt": "^5.0.0",
     "class-transformer": "^0.2.3",
-    "class-validator": "^0.12.2",
+    "class-validator": "^0.14.0",
     "dotenv": "^8.2.0",
     "mssql": "^6.2.3",
     "passport": "^0.4.1",
